@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Schengen Timer</title>
+<!-- Home Screen app: full screen, dark status bar, our icon and name -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Schengen">
+<meta name="theme-color" content="#05080f">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+html, body { margin: 0; background: #05080f; overscroll-behavior: none; }
+/* the app fills the whole screen and keeps clear of the clock and the home bar by itself.
+   Not "position: fixed": in iPhone Home Screen apps that gets cut off at the bottom. */
+html { height: 100vh; overflow: hidden; }
+body { height: 100%; overflow: hidden; position: relative; }
+#app { position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+  border: 0; display: block; background: #05080f; opacity: 0; transition: opacity .3s; }
+#app.on { opacity: 1; }
+#msg { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; color: #8b98b5;
+  font: 15px/1.5 system-ui, sans-serif; text-align: center; }
+.spin { width: 28px; height: 28px; border-radius: 50%; border: 3px solid #17233b; border-top-color: #3f86ff; animation: s .8s linear infinite; }
+@keyframes s { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div id="msg"><div class="spin"></div></div>
+<iframe id="app" title="Schengen Timer"></iframe>
+<script>
+// ▼ Apps Script web app link (Deploy → Manage deployments → Web app URL, ends in /exec)
+const APP_URL = 'https://script.google.com/macros/s/AKfycbwickaSTaV8SpBEg0xrIkwLHT9MC_mzpfdhMngdb6jULKBg_RhV0DWK0-kBan-7_eer/exec';
+
+const app = document.getElementById('app'), msg = document.getElementById('msg');
+// opened in a normal Safari tab (not from the Home Screen): fit between Safari's bars instead
+if (!(navigator.standalone || matchMedia('(display-mode: standalone)').matches)) document.documentElement.style.height = '100dvh';
+// optional key: open this page as …/#k=KEY (only needed if makeKey() was run in Apps Script)
+const key = (location.hash.match(/k=([^&]+)/) || [])[1];
+if (!/^https:\/\/script\.google\.com\/.+\/exec/.test(APP_URL)) {
+  msg.textContent = 'Paste your Apps Script /exec link into index.html (the APP_URL line).';
+} else {
+  app.onload = () => setTimeout(() => { app.classList.add('on'); msg.style.display = 'none'; }, 350);
+  app.src = APP_URL + (key ? '?k=' + encodeURIComponent(decodeURIComponent(key)) : '');
+}
+</script>
+</body>
+</html>
